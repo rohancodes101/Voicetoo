@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voice to Text Translator</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        /* Overall Body Styling */
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        /* Main container styling for flex layout */
+        .main-container {
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            padding: 2rem;
+        }
+
+        /* Left Section: Speech Input */
+        .left,
+        .right,
+        .center {
+            padding: 2rem;
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0px 10px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Styling for the left side (microphone button and input text) */
+        .left {
+            width: 25%;
+            text-align: center;
+        }
+
+        .left h2 {
+            font-size: 1.5rem;
+            color: #4b4b4b;
+            margin-bottom: 1.5rem;
+        }
+
+        .left textarea {
+            border-radius: 8px;
+            border: 2px solid #ddd;
+            padding: 1rem;
+            width: 100%;
+            resize: none;
+            font-size: 1rem;
+            background: #f7f7f7;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            font-family: 'Poppins', sans-serif;
+        }
+
+        /* Styling for the center section (language dropdowns) */
+        .center {
+            width: 30%;
+            margin: 0 1rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 1.5rem;
+        }
+
+        .center h2 {
+            font-size: 1.75rem;
+            color: #4b4b4b;
+            text-align: center;
+        }
+
+        .dropdown-container {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .dropdown-container select {
+            padding: 1rem;
+            border-radius: 8px;
+            border: 2px solid #ddd;
+            background: #f7f7f7;
+            font-size: 1rem;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Styling for the right section (output text and audio) */
+        .right {
+            width: 30%;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .right h2 {
+            font-size: 1.75rem;
+            color: #4b4b4b;
+            margin-bottom: 1rem;
+        }
+
+        .right p {
+            font-size: 1.25rem;
+            color: #4b4b4b;
+            margin-top: 1rem;
+        }
+
+        .right .audio-player {
+            width: 100%;
+            max-width: 300px;
+        }
+
+        .audio-icon {
+            cursor: pointer;
+            width: 3rem;
+            height: 3rem;
+            margin-top: 1rem;
+        }
+
+        /* Responsive Design for smaller screens */
+        @media screen and (max-width: 1024px) {
+            .main-container {
+                flex-direction: column;
+                padding: 1rem;
+            }
+
+            .left,
+            .center,
+            .right {
+                width: 100%;
+                margin-bottom: 2rem;
+            }
+
+            .center {
+                flex-direction: row;
+                gap: 2rem;
+            }
+
+            .audio-player {
+                max-width: 90%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="header text-center mb-4 mt-2">
+        <h1 class="title text-4xl font-extrabold text-gray-800">Voice to Text Translator</h1>
+        <p class="subtitle text-lg text-white mt-2">Speak in your language, and get the translated text!</p>
+    </div>
+
+    <div class="main-container">
+        <!-- Left Section: Spoken Text and Microphone Button -->
+        <div class="left">
+            <h2 class="font-semibold text-2xl text-indigo-600">Speak & Translate</h2>
+            <p class="text-lg text-gray-600 mb-4">Press the mic and speak in any supported language</p>
+            <!-- Microphone Button -->
+            <div class="mb-4">
+                <img id="start"
+                    src="https://thumbs.dreamstime.com/b/mic-button-icon-black-line-art-vector-black-white-outline-set-collection-sign-mic-button-icon-black-line-art-vector-logo-330201591.jpg"
+                    alt="Start Speaking"
+                    class="cursor-pointer w-20 h-20 rounded-full border-4 border-indigo-600 shadow-lg">
+            </div>
+            <!-- Spoken Text Box -->
+            <textarea id="textInput" class="w-full p-3 mt-4 border rounded-md shadow-sm text-gray-900" rows="6"
+                placeholder="Your spoken words will appear here" readonly></textarea>
+        </div>
+
+        <!-- Center Section: Language Dropdowns -->
+        <div class="center">
+            <h2 class="font-semibold text-2xl text-indigo-600">Choose Languages</h2>
+            <div class="dropdown-container">
+                <!-- Source Language Dropdown -->
+                <div>
+                    <label for="sourceLanguageSelect" class="block text-sm font-medium text-gray-700">I am Speaking
+                        in:</label>
+                    <select id="sourceLanguageSelect"
+                        class="w-full p-3 mt-1 border rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-gray-900">
+                        <option value="en">English (en)</option>
+                        <option value="as">Assamese (as)</option>
+                        <option value="bn">Bengali (bn)</option>
+                        <option value="gu">Gujarati (gu)</option>
+                        <option value="hi">Hindi (hi)</option>
+                        <option value="kn">Kannada (kn)</option>
+                        <option value="ks">Kashmiri (ks)</option>
+                        <option value="kok">Konkani (kok)</option>
+                        <option value="ml">Malayalam (ml)</option>
+                        <option value="mr">Marathi (mr)</option>
+                        <option value="ne">Nepali (ne)</option>
+                        <option value="or">Odia (or)</option>
+                        <option value="pa">Punjabi (pa)</option>
+                        <option value="sa">Sanskrit (sa)</option>
+                        <option value="sd">Sindhi (sd)</option>
+                        <option value="ta">Tamil (ta)</option>
+                        <option value="te">Telugu (te)</option>
+                        <option value="ur">Urdu (ur)</option>
+                    </select>
+                </div>
+
+                <!-- English Accent Dropdown (for English only) -->
+                <div id="sourceAccentSelectContainer" style="display:none;">
+                    <label for="sourceAccentSelect" class="block text-sm font-medium text-gray-700">Choose Accent
+                        (English Only):</label>
+                    <select id="sourceAccentSelect"
+                        class="w-full p-3 mt-1 border rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-gray-900">
+                        <option value="com.au">English (Australia)</option>
+                        <option value="co.uk">English (United Kingdom)</option>
+                        <option value="us">English (United States)</option>
+                        <option value="ca">English (Canada)</option>
+                        <option value="co.in">English (India)</option>
+                        <option value="ie">English (Ireland)</option>
+                        <option value="co.za">English (South Africa)</option>
+                        <option value="com.ng">English (Nigeria)</option>
+                    </select>
+                </div>
+
+                <!-- Target Language Dropdown -->
+                <div>
+                    <label for="targetLanguageSelect" class="block text-sm font-medium text-gray-700">I want to
+                        Translate to:</label>
+                    <select id="targetLanguageSelect"
+                        class="w-full p-3 mt-1 border rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-gray-900">
+                        <option value="en">English (en)</option>
+                        <option value="as">Assamese (as)</option>
+                        <option value="bn">Bengali (bn)</option>
+                        <option value="gu">Gujarati (gu)</option>
+                        <option value="hi">Hindi (hi)</option>
+                        <option value="kn">Kannada (kn)</option>
+                        <option value="ks">Kashmiri (ks)</option>
+                        <option value="kok">Konkani (kok)</option>
+                        <option value="ml">Malayalam (ml)</option>
+                        <option value="mr">Marathi (mr)</option>
+                        <option value="ne">Nepali (ne)</option>
+                        <option value="or">Odia (or)</option>
+                        <option value="pa">Punjabi (pa)</option>
+                        <option value="sa">Sanskrit (sa)</option>
+                        <option value="sd">Sindhi (sd)</option>
+                        <option value="ta">Tamil (ta)</option>
+                        <option value="te">Telugu (te)</option>
+                        <option value="ur">Urdu (ur)</option>
+                    </select>
+                </div>
+
+                <!-- Target English Accent Dropdown (for English only) -->
+                <div id="targetAccentSelectContainer" style="display:none;">
+                    <label for="targetAccentSelect" class="block text-sm font-medium text-gray-700">Choose Accent
+                        (English Only):</label>
+                    <select id="targetAccentSelect"
+                        class="w-full p-3 mt-1 border rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-gray-900">
+                        <option value="com.au">English (Australia)</option>
+                        <option value="co.uk">English (United Kingdom)</option>
+                        <option value="us">English (United States)</option>
+                        <option value="ca">English (Canada)</option>
+                        <option value="co.in">English (India)</option>
+                        <option value="ie">English (Ireland)</option>
+                        <option value="co.za">English (South Africa)</option>
+                        <option value="com.ng">English (Nigeria)</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Section: Translated Text and Audio -->
+        <div class="right">
+            <h2 class="font-semibold text-2xl text-indigo-600">Translation Output</h2>
+            <!-- Translated Text Output -->
+            <div id="result" class="text-center">
+                <p class="text-lg text-gray-600">Your translation will appear here.</p>
+            </div>
+
+            <!-- Audio Player -->
+            <div id="audioContainer" class="mt-4 text-center hidden">
+                <audio id="audioPlayer" class="audio-player" controls></audio>
+                <img id="speakerImage" src="https://static.thenounproject.com/png/899261-200.png" alt="Speaker Icon"
+                    class="audio-icon">
+            </div>
+        </div>
+    </div>
+
+    <script type="text/javascript">
+        var startButton = document.getElementById('start');
+        var resultElement = document.getElementById('textInput');
+        var recognition = new webkitSpeechRecognition();
+        recognition.lang = window.navigator.language;  // Automatically use user's language
+        recognition.interimResults = true;
+        // Show or hide accent dropdown based on language selection
+        document.getElementById('sourceLanguageSelect').addEventListener('change', function () {
+            if (this.value === 'en') {
+                document.getElementById('sourceAccentSelectContainer').style.display = 'block';
+            } else {
+                document.getElementById('sourceAccentSelectContainer').style.display = 'none';
+            }
+        });
+
+        // Similarly, handle the target language selection for accents
+        document.getElementById('targetLanguageSelect').addEventListener('change', function () {
+            if (this.value === 'en') {
+                document.getElementById('targetAccentSelectContainer').style.display = 'block';
+            } else {
+                document.getElementById('targetAccentSelectContainer').style.display = 'none';
+            }
+        });
+
+        // Trigger the accent dropdown visibility on page load based on the initial selected language
+        (function () {
+            if (document.getElementById('sourceLanguageSelect').value === 'en') {
+                document.getElementById('sourceAccentSelectContainer').style.display = 'block';
+            } else {
+                document.getElementById('sourceAccentSelectContainer').style.display = 'none';
+            }
+
+            if (document.getElementById('targetLanguageSelect').value === 'en') {
+                document.getElementById('targetAccentSelectContainer').style.display = 'block';
+            } else {
+                document.getElementById('targetAccentSelectContainer').style.display = 'none';
+            }
+        })();
+
+        // Start speech recognition when microphone is clicked
+        startButton.addEventListener('click', () => {
+            recognition.start();
+        });
+
+        // Process the speech recognition result
+        recognition.addEventListener('result', (event) => {
+            const result = event.results[event.results.length - 1][0].transcript;
+            resultElement.textContent = result;  // Display the spoken text
+        });
+
+        // Automatically start translation after speech recognition ends
+        recognition.addEventListener('end', () => {
+            const textInput = resultElement.textContent;
+            const sourceLanguage = document.getElementById('sourceLanguageSelect').value;
+            const targetLanguage = document.getElementById('targetLanguageSelect').value;
+            const sourceAccent = document.getElementById('sourceAccentSelect') ? document.getElementById('sourceAccentSelect').value : '';
+            const targetAccent = document.getElementById('targetAccentSelect') ? document.getElementById('targetAccentSelect').value : '';
+
+            if (!textInput) {
+                return;
+            }
+
+            // Display "Translating..." message
+            document.getElementById('result').innerHTML = `<p class="text-gray-500">Translating...</p>`;
+
+            // Start translation process automatically
+            translateText(textInput, sourceLanguage, targetLanguage, sourceAccent, targetAccent);
+        });
+
+        // Translate function to handle text translation
+        async function translateText(textInput, sourceLanguage, targetLanguage, sourceAccent, targetAccent) {
+            const resultDiv = document.getElementById('result');
+            const audioPlayer = document.getElementById('audioPlayer');
+            const audioContainer = document.getElementById('audioContainer');
+
+            try {
+                const response = await fetch('/translate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        text: textInput,
+                        source_lang: sourceLanguage,
+                        target_lang: targetLanguage,
+                        source_accent: sourceAccent,
+                        target_accent: targetAccent
+                    })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    resultDiv.innerHTML = `<p class="text-xl text-gray-800 font-semibold">Translated Text:</p><p class="mt-2 text-lg text-gray-600">${result.text}</p>`;
+                    audioPlayer.src = result.audio_url;
+                    audioContainer.classList.remove('hidden');
+                    audioPlayer.play();
+                } else {
+                    resultDiv.innerHTML = `<p class="text-red-500">Error: ${result.error}</p>`;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<p class="text-red-500">An error occurred. Please try again later.</p>`;
+            }
+        }
+    </script>
+</body>
+
+</html>
